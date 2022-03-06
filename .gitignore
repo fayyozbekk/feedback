@@ -1,0 +1,6 @@
+app/env
+__pycache__
+*.sqlite3
+app/.pytest_cache
+.idea
+
