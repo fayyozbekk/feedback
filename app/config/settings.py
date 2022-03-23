@@ -147,3 +147,4 @@ if not DEBUG:
 
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+CSRF_TRUSTED_ORIGINS = ['https://*.herokuapp.com']
