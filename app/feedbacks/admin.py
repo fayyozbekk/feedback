@@ -4,7 +4,7 @@ from .models import Teacher, Student, Module, Feedback
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    fields = ["first_name", "last_name", "guid", "module", "is_leader", "created_at", "changed_at"]
+    fields = ["first_name", "last_name", "module", "is_leader", "created_at", "changed_at"]
     list_display = ["guid", "module", "is_leader", "created_at", "changed_at"]
     readonly_fields = ["created_at", "changed_at"]
 
@@ -25,6 +25,6 @@ class ModuleAdmin(admin.ModelAdmin):
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
-    fields = ["guid", "student", "module", "text", "teacher", "created_at", "changed_at"]
-    list_display = ["guid", "student", "module", "text", "teacher", "created_at", "changed_at"]
+    fields = ["module", "text", "teacher", "created_at", "changed_at"]
+    list_display = ["guid", "module", "text", "teacher", "created_at", "changed_at"]
     readonly_fields = ["created_at", "changed_at"]

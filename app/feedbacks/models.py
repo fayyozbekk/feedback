@@ -1,10 +1,50 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 import uuid
 
 
+class UserManager(BaseUserManager):
+    """Define a model manager for User model with no username field."""
+
+    use_in_migrations = True
+
+    def _create_user(self, email, password, **extra_fields):
+        """Create and save a User with the given email and password."""
+        if not email:
+            raise ValueError('The given email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        """Create and save a regular User with the given email and password."""
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        """Create and save a SuperUser with the given email and password."""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+
+
 class GenericUser(AbstractUser):
-    pass
+    username = None
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
 
 
 class Student(GenericUser):
@@ -54,7 +94,10 @@ class Module(models.Model):
         return self.name
 
 
-class Teacher(GenericUser):
+class Teacher(models.Model):
+    email = models.EmailField()
+    first_name = models.CharField(max_length=250, null=True)
+    last_name = models.CharField(max_length=250, null=True)
     guid = models.UUIDField(unique=True, default=uuid.uuid4)
     module = models.ForeignKey(Module, related_name="teachers", on_delete=models.DO_NOTHING, null=True)
     is_leader = models.BooleanField(default=False)
@@ -71,7 +114,6 @@ class Teacher(GenericUser):
 
 class Feedback(models.Model):
     guid = models.UUIDField(unique=True, default=uuid.uuid4)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=False)
     text = models.TextField()
     module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.DO_NOTHING)
     teacher = models.ForeignKey(Teacher, null=True, blank=True, on_delete=models.DO_NOTHING)
@@ -79,4 +121,4 @@ class Feedback(models.Model):
     changed_at = models.DateTimeField(auto_now=True, editable=False)
 
     def __str__(self):
-        return f"Feedback from {self.student} for {self.module}{self.teacher}"
+        return f"Feedback for {self.module}{self.teacher}"
