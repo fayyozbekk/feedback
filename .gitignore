@@ -5,3 +5,4 @@ app/.pytest_cache
 .idea
 app/.env
 app/.idea
+app/venv
