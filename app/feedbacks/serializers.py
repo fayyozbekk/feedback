@@ -23,6 +23,12 @@ class FeedbackSerializer(serializers.ModelSerializer):
             return feedback
 
 
+class FSerializer(serializers.Serializer):
+    text = serializers.CharField(allow_blank=True)
+    module = serializers.UUIDField(allow_null=True)
+    teacher = serializers.UUIDField(allow_null=True)
+
+
 class TeacherSerializer(serializers.ModelSerializer):
 
     class Meta:

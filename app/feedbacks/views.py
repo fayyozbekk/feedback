@@ -4,14 +4,15 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Feedback, Teacher, Module
-from .serializers import FeedbackSerializer, TeacherSerializer, ModuleSerializer
+from .serializers import FeedbackSerializer, TeacherSerializer, ModuleSerializer, FSerializer
 
 
 class FeedbackList(APIView):
     def post(self, request, format=None):
-        serializer = FeedbackSerializer(data=request.data)
+        serializer = FSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            module = Module.objects.get(guid=serializer.validated_data["module"])
+            Feedback.objects.create(text=serializer.validated_data["text"], module=module)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
